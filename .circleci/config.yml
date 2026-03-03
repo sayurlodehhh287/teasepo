@@ -7,7 +7,6 @@ executors:
         auth:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
-    # Mendefinisikan resource class agar performa stabil
     resource_class: xlarge 
 
 jobs:
